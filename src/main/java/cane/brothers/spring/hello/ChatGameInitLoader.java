@@ -20,28 +20,37 @@ public class ChatGameInitLoader {
 
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent() {
-        // clean-up
-        for (Game game : gameRepo.findAll()) {
-            gameRepo.delete(game);
-        }
-        for (Chat chat : chatRepo.findAll()) {
-            chatRepo.delete(chat);
-        }
 
         // new game
-        Chat newChat = Chat.builder().chatId(123L).build();
-        newChat = chatRepo.save(newChat);
-        log.info(newChat.toString());
+        final Chat newChat = Chat.builder().chatId(123L).build();
+        Chat chat = chatRepo.findByChatId(123L)
+                .orElseGet(() -> chatRepo.save(newChat));
+        log.info(chat.toString());
 
         Game newGame = Game.builder()
                 .complexity(4).secret(new GuessNumber(new int[]{9, 8, 7, 6}))
-                .chat(AggregateReference.to(newChat.id()))
+                .chat(AggregateReference.to(chat.getId()))
                 .build();
         newGame = gameRepo.save(newGame);
         log.info(newGame.toString());
 
-        gameRepo.findByChat(newChat)
-                .ifPresentOrElse(a -> log.info("a: " + a), null);
+        chat.setGame(AggregateReference.to(newGame.getGameId()));
+        chat = chatRepo.save(chat);
+        log.info(chat.toString());
+
+        newGame = Game.builder()
+                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
+                .chat(AggregateReference.to(chat.getId()))
+                .build();
+        newGame = gameRepo.save(newGame);
+        log.info(newGame.toString());
+
+        chat.setGame(AggregateReference.to(newGame.getGameId()));
+        chat = chatRepo.save(chat);
+        log.info(chat.toString());
+
+        gameRepo.findByChat(chat)
+                .forEach(a -> log.info("a: " + a));
     }
 
 
