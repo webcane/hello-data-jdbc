@@ -4,7 +4,7 @@ import cane.brothers.game.IGuessNumber;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
@@ -13,11 +13,14 @@ import java.util.UUID;
 @Builder
 @Table("guess_game")
 class Game {
-        @Id
-        private UUID gameId;
-        private int complexity;
-        private IGuessNumber secret;
-        private AggregateReference<Chat, UUID> chat;
-
+    @Id
+    @Column("game_id")
+    private UUID gameId;
+    @Column("complexity")
+    private int complexity;
+    @Column("secret")
+    private IGuessNumber secret;
+    @Column("ordinal")
+    private int ordinal;
 //    private LinkedList<GuessTurn> turns;
 }

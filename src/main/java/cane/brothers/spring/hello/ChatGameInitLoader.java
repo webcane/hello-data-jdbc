@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Component;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by cane
@@ -16,42 +18,37 @@ import org.springframework.stereotype.Component;
 public class ChatGameInitLoader {
 
     private final ChatRepository chatRepo;
-    private final GameRepository gameRepo;
 
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent() {
 
+        long chatId = 124L;
+
         // new game
-        final Chat newChat = Chat.builder().chatId(123L).build();
-        Chat chat = chatRepo.findByChatId(123L)
+        List<Game> allGames = new LinkedList<>();
+        Game newGame = Game.builder()
+                .ordinal(1)
+                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
+                .build();
+        allGames.add(newGame);
+
+        final Chat newChat = Chat.builder()
+                .chatId(chatId)
+                .allGames(allGames)
+                .build();
+        Chat chat = chatRepo.findByChatId(chatId)
                 .orElseGet(() -> chatRepo.save(newChat));
         log.info(chat.toString());
 
-        Game newGame = Game.builder()
+        var ordinal = chat.getMaxOrdinal();
+
+        Game newGame2 = Game.builder()
+                .ordinal(++ordinal)
                 .complexity(4).secret(new GuessNumber(new int[]{9, 8, 7, 6}))
-                .chat(AggregateReference.to(chat.getId()))
                 .build();
-        newGame = gameRepo.save(newGame);
-        log.info(newGame.toString());
 
-        chat.setGame(AggregateReference.to(newGame.getGameId()));
+        chat.getAllGames().add(newGame2);
         chat = chatRepo.save(chat);
         log.info(chat.toString());
-
-        newGame = Game.builder()
-                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
-                .chat(AggregateReference.to(chat.getId()))
-                .build();
-        newGame = gameRepo.save(newGame);
-        log.info(newGame.toString());
-
-        chat.setGame(AggregateReference.to(newGame.getGameId()));
-        chat = chatRepo.save(chat);
-        log.info(chat.toString());
-
-        gameRepo.findByChat(chat)
-                .forEach(a -> log.info("a: " + a));
     }
-
-
 }

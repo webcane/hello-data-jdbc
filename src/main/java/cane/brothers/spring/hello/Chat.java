@@ -3,10 +3,9 @@ package cane.brothers.spring.hello;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Builder
@@ -16,5 +15,15 @@ class Chat {
     private UUID id;
     private Long chatId;
     private Integer lastMessageId;
-    private AggregateReference<Game, UUID> game;
+    private List<Game> allGames;
+
+    public Optional<Game> getCurrentGame() {
+        return allGames == null ? Optional.empty() :
+                allGames.stream()
+                        .max(Comparator.comparing(Game::getOrdinal));
+    }
+
+    public int getMaxOrdinal() {
+        return allGames == null ? 0 : getCurrentGame().map(Game::getOrdinal).orElse(0);
+    }
 }
