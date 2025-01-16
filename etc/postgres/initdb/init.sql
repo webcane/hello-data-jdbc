@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS guess_game (
     game_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     complexity INTEGER CHECK (complexity > 0 AND complexity < 10),
     secret INTEGER[],
-    ordinal INTEGER NOT NULL CHECK (ordinal > 0),
+    chat_game_key INTEGER NOT NULL,
     chat_game UUID NOT NULL REFERENCES chat_game(id)
 );
