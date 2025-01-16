@@ -6,8 +6,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by cane
@@ -22,16 +22,10 @@ public class ChatGameInitLoader {
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent() {
 
-        long chatId = 124L;
+        long chatId = 123L;
 
         // new game
-        List<Game> allGames = new LinkedList<>();
-        Game newGame = Game.builder()
-                .ordinal(1)
-                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
-                .build();
-        allGames.add(newGame);
-
+        Set<Game> allGames = new LinkedHashSet<>();
         final Chat newChat = Chat.builder()
                 .chatId(chatId)
                 .allGames(allGames)
@@ -41,6 +35,15 @@ public class ChatGameInitLoader {
         log.info(chat.toString());
 
         var ordinal = chat.getMaxOrdinal();
+
+        Game newGame = Game.builder()
+                .ordinal(++ordinal)
+                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
+                .build();
+
+        chat.getAllGames().add(newGame);
+        chat = chatRepo.save(chat);
+        log.info(chat.toString());
 
         Game newGame2 = Game.builder()
                 .ordinal(++ordinal)

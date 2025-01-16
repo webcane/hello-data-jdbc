@@ -5,7 +5,10 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -15,7 +18,7 @@ class Chat {
     private UUID id;
     private Long chatId;
     private Integer lastMessageId;
-    private List<Game> allGames;
+    private Set<Game> allGames;
 
     public Optional<Game> getCurrentGame() {
         return allGames == null ? Optional.empty() :
@@ -24,6 +27,7 @@ class Chat {
     }
 
     public int getMaxOrdinal() {
-        return allGames == null ? 0 : getCurrentGame().map(Game::getOrdinal).orElse(0);
+        return allGames == null ? 0 :
+                getCurrentGame().map(Game::getOrdinal).orElse(0);
     }
 }
