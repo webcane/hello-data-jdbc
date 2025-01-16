@@ -22,19 +22,11 @@ public class ChatGameInitLoader {
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent() {
 
-        long chatId = 124L;
-
-        // new game
-        List<Game> allGames = new LinkedList<>();
-        Game newGame = Game.builder()
-                .ordinal(1)
-                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
-                .build();
-        allGames.add(newGame);
+        long chatId = 125L;
 
         final Chat newChat = Chat.builder()
                 .chatId(chatId)
-                .allGames(allGames)
+                .allGames(new LinkedList<>())
                 .build();
         Chat chat = chatRepo.findByChatId(chatId)
                 .orElseGet(() -> chatRepo.save(newChat));
@@ -42,13 +34,30 @@ public class ChatGameInitLoader {
 
         var ordinal = chat.getMaxOrdinal();
 
-        Game newGame2 = Game.builder()
+        // new game
+        Game newGame = Game.builder()
                 .ordinal(++ordinal)
-                .complexity(4).secret(new GuessNumber(new int[]{9, 8, 7, 6}))
+                .complexity(4)
+                .secret(new GuessNumber(new int[]{1, 2, 3, 4}))
+                .turns(new LinkedList<>())
                 .build();
+        chat.getAllGames().add(newGame);
+        chat = chatRepo.save(chat);
 
-        chat.getAllGames().add(newGame2);
+        Turn turn = Turn.builder().guess(new GuessNumber(new int[]{2, 3, 4, 0})).build();
+        newGame.getTurns().add(turn);
         chat = chatRepo.save(chat);
         log.info(chat.toString());
+
+//        Game newGame2 = Game.builder()
+//                .ordinal(++ordinal)
+//                .complexity(4)
+//                .secret(new GuessNumber(new int[]{9, 8, 7, 6}))
+//                .turns(new LinkedList<>())
+//                .build();
+//
+//        chat.getAllGames().add(newGame2);
+//        chat = chatRepo.save(chat);
+//        log.info(chat.toString());
     }
 }
