@@ -2,6 +2,8 @@ package cane.brothers.spring.hello;
 
 import cane.brothers.game.IGuessNumber;
 
+import java.util.Arrays;
+
 record GuessNumber(int[] digits) implements IGuessNumber {
 
     @Override
@@ -17,5 +19,10 @@ record GuessNumber(int[] digits) implements IGuessNumber {
     @Override
     public int[] getDigits() {
         return this.digits;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(this.digits);
     }
 }

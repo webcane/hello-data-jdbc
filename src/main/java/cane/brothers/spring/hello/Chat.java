@@ -22,8 +22,4 @@ class Chat {
                 allGames.stream()
                         .max(Comparator.comparing(Game::getOrdinal));
     }
-
-    public int getMaxOrdinal() {
-        return allGames == null ? 0 : getCurrentGame().map(Game::getOrdinal).orElse(0);
-    }
 }

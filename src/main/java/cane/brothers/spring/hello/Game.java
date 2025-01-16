@@ -15,13 +15,10 @@ import java.util.UUID;
 @Table("guess_game")
 class Game {
     @Id
-    @Column("game_id")
     private UUID gameId;
-    @Column("complexity")
     private int complexity;
-    @Column("secret")
     private IGuessNumber secret;
-    @Column("ordinal")
+    @Column("chat_game_key")
     private int ordinal;
     private List<Turn> turns;
 }
