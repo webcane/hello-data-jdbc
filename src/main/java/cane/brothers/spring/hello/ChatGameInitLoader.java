@@ -6,8 +6,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.time.OffsetDateTime;
 
 /**
  * Created by cane
@@ -15,43 +14,57 @@ import java.util.Set;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChatGameInitLoader {
+class ChatGameInitLoader {
 
     private final ChatRepository chatRepo;
 
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent() {
+        long chatId = 111L;
 
-        long chatId = 123L;
+        Chat chat = chatRepo.findByChatId(chatId)
+                .orElseGet(() -> chatRepo.save(new Chat(chatId)));
+        log.info(chat.toString());
+
 
         // new game
-        Set<Game> allGames = new LinkedHashSet<>();
-        final Chat newChat = Chat.builder()
-                .chatId(chatId)
-                .allGames(allGames)
-                .build();
-        Chat chat = chatRepo.findByChatId(chatId)
-                .orElseGet(() -> chatRepo.save(newChat));
+        Game newGame = new Game(new GuessNumber(new int[]{1, 2, 3, 4}));
+        chat.addNewGame(newGame);
+        chatRepo.saveNewGame(chat);
+
+        chat = chatRepo.findByChatId(chatId).orElseThrow();
         log.info(chat.toString());
 
-        var ordinal = chat.getMaxOrdinal();
-
-        Game newGame = Game.builder()
-                .ordinal(++ordinal)
-                .complexity(4).secret(new GuessNumber(new int[]{1, 2, 3, 4}))
+        //Game curentGame = chat.getCurrentGame();
+        Turn turn = Turn.builder()
+                .guess(new GuessNumber(new int[]{2, 3, 4, 0}))
+                .bulls(0)
+                .cows(3)
+                .moveTime(OffsetDateTime.now())
                 .build();
-
-        chat.getAllGames().add(newGame);
-        chat = chatRepo.save(chat);
+        //curentGame.getTurns().add(turn);
+        //chat = chatRepo.save(chat);
+        chat.addTurn(turn);
+        chatRepo.saveTurn(chat);
         log.info(chat.toString());
 
-        Game newGame2 = Game.builder()
-                .ordinal(++ordinal)
-                .complexity(4).secret(new GuessNumber(new int[]{9, 8, 7, 6}))
-                .build();
+        chat = chatRepo.findByChatId(chatId).orElseThrow();
+        log.info(chat.toString());
 
-        chat.getAllGames().add(newGame2);
-        chat = chatRepo.save(chat);
+        // curentGame = chat.getCurrentGame();
+        turn = Turn.builder()
+                .guess(new GuessNumber(new int[]{3, 4, 5, 6}))
+                .bulls(0)
+                .cows(2)
+                .moveTime(OffsetDateTime.now())
+                .build();
+        //   curentGame.getTurns().add(turn);
+        chat.addTurn(turn);
+        chatRepo.saveTurn(chat);
+
+        //  chat = chatRepo.save(chat);
+        // log.info(chat.toString());
+        chat = chatRepo.findByChatId(chatId).orElseThrow();
         log.info(chat.toString());
     }
 }
