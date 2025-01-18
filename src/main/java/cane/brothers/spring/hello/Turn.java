@@ -2,20 +2,25 @@ package cane.brothers.spring.hello;
 
 import cane.brothers.game.IGuessNumber;
 import lombok.Builder;
+import lombok.Data;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.OffsetDateTime;
 
 @Builder
+@Data
 @Table("guess_turn")
-public record Turn(
-        IGuessNumber guess,
-        int bulls,
-        int cows,
-        OffsetDateTime moveTime,
+public class Turn {
+        private IGuessNumber guess;
+        private int bulls;
+        private int cows;
+        private OffsetDateTime moveTime;
         @Column("chat_game_key")
-        int chatOrdinal,
+        private int chatOrdinal;
+        @Transient
+        private Game guessGame;
         @Column("guess_game_key")
-        int gameOrdinal) {
+        private int gameOrdinal;
 }

@@ -2,13 +2,18 @@ package cane.brothers.spring.hello;
 
 import cane.brothers.game.IGuessNumber;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.jdbc.core.mapping.JdbcValue;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
+import javax.sql.DataSource;
 import java.sql.JDBCType;
 import java.sql.SQLType;
 import java.util.Arrays;
@@ -18,6 +23,18 @@ import java.util.UUID;
 
 @Configuration
 class JdbcConfig extends AbstractJdbcConfiguration {
+
+    @Bean
+    DataSourceInitializer initializer(DataSource dataSource) {
+        var initializer = new DataSourceInitializer();
+        initializer.setDataSource(dataSource);
+
+        var script = new ClassPathResource("schema.sql");
+        var populator = new ResourceDatabasePopulator(script);
+        initializer.setDatabasePopulator(populator);
+
+        return initializer;
+    }
 
     @Override
     protected List<?> userConverters() {

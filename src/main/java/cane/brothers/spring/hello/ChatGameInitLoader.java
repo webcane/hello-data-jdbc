@@ -38,7 +38,8 @@ public class ChatGameInitLoader {
                 .turns(new LinkedList<>())
                 .build();
         chat.getAllGames().add(newGame);
-        chat = chatRepo.save(chat);
+//        chat = chatRepo.save(chat);
+        chatRepo.newGame(chat, newGame);
 
         Game curentGame = chat.getCurrentGame().get();
         Turn turn = Turn.builder()
