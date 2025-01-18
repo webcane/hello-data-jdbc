@@ -27,7 +27,7 @@ class JdbcConfig extends AbstractJdbcConfiguration {
         var initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
 
-        var script = new ClassPathResource("schema.sql");
+        var script = new ClassPathResource("initdb/schema.sql");
         var populator = new ResourceDatabasePopulator(script);
         initializer.setDatabasePopulator(populator);
 
