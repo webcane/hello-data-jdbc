@@ -14,8 +14,6 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
-import java.sql.JDBCType;
-import java.sql.SQLType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -58,21 +56,7 @@ class JdbcConfig extends AbstractJdbcConfiguration {
 
         @Override
         public JdbcValue convert(IGuessNumber source) {
-            var sqlType = new SQLType() {
-                @Override
-                public String getName() {
-                    return "Integer[]";
-                }
-                @Override
-                public String getVendor() {
-                    return "Postgres";
-                }
-                @Override
-                public Integer getVendorTypeNumber() {
-                    return JDBCType.ARRAY.getVendorTypeNumber();
-                }
-            };
-            return JdbcValue.of(source.getDigits(), sqlType);
+            return JdbcValue.of(source.getDigits(), new GuessNumberSQLType());
         }
     }
 
@@ -80,21 +64,7 @@ class JdbcConfig extends AbstractJdbcConfiguration {
     static class UUIDWritingConverter implements Converter<UUID, JdbcValue> {
         @Override
         public JdbcValue convert(UUID source) {
-            var sqlType = new SQLType() {
-                @Override
-                public String getName() {
-                    return "uuid";
-                }
-                @Override
-                public String getVendor() {
-                    return "Postgres";
-                }
-                @Override
-                public Integer getVendorTypeNumber() {
-                    return JDBCType.OTHER.getVendorTypeNumber();
-                }
-            };
-            return JdbcValue.of(source, sqlType);
+            return JdbcValue.of(source, new UUIDSQLType());
         }
     }
 }

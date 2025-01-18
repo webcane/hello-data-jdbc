@@ -1,33 +1,58 @@
 package cane.brothers.spring.hello;
 
 import cane.brothers.game.IGuessNumber;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
-@Builder
 @Table("guess_game")
 class Game {
     @Id
     private UUID gameId;
     private int complexity;
     private IGuessNumber secret;
-    @Column("chat_game_key")
     private int ordinal;
-    @Transient
-    private Chat chatGame;
-    private List<Turn> turns;
+    private SortedSet<Turn> turns = new TreeSet<>(Comparator.comparingInt(Turn::getOrdinal));
+
+    /**
+     * Save constructor
+     *
+     * @param secret the secret number
+     */
+    Game(IGuessNumber secret) {
+        this.complexity = secret.getComplexity();
+        this.secret = secret;
+    }
+
+    /**
+     * Load constructor
+     *
+     * @param gameId db entity id
+     * @param complexity complexity
+     * @param secret secret
+     * @param ordinal ordinal of a game
+     * @param turns collection of turns
+     */
+    @PersistenceCreator
+    private Game(UUID gameId, int complexity, IGuessNumber secret, int ordinal, Collection<Turn> turns) {
+        this.gameId = gameId;
+        this.complexity = complexity;
+        this.secret = secret;
+        this.ordinal = ordinal;
+        this.turns.addAll(turns);
+    }
 
 //    @Modifying
 //    public void addTurn(Turn newTurn) {
 //        turns.add(newTurn);
 //        newTurn.setGuessGame(this);
 //    }
+
+    public Turn getLastTurn() {
+        return turns.last();
+    }
 }

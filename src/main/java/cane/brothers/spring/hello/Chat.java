@@ -1,18 +1,17 @@
 package cane.brothers.spring.hello;
 
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+/**
+ * Chat guess game root aggregate
+ */
 @Data
-@Builder
 @Table("chat_game")
 class Chat {
     @Version
@@ -21,17 +20,32 @@ class Chat {
     private UUID id;
     private Long chatId;
     private Integer lastMessageId;
-    private List<Game> allGames;
+    private SortedSet<Game> allGames = new TreeSet<>(Comparator.comparingInt(Game::getOrdinal));
 
-    public Optional<Game> getCurrentGame() {
-        return allGames == null ? Optional.empty() :
-                allGames.stream()
-                        .max(Comparator.comparing(Game::getOrdinal));
+    Chat(Long chatId) {
+        this.chatId = chatId;
     }
 
-//    @Modifying
-//    public void addGame(Game newGame) {
-//        allGames.add(newGame);
-//        newGame.setChatGame(this);
-//    }
+    @PersistenceCreator
+    private Chat(UUID id, Long chatId, Integer lastMessageId, Collection<Game> allGames, int version) {
+        this.id = id;
+        this.chatId = chatId;
+        this.lastMessageId = lastMessageId;
+        this.allGames.addAll(allGames);
+        this.version = version;
+    }
+
+    public Game getCurrentGame() {
+        return allGames.last();
+    }
+
+    public boolean addNewGame(Game newGame) {
+        return getAllGames().add(newGame);
+    }
+
+    public boolean addTurn(Turn newTurn) {
+        return getCurrentGame().getTurns().add(newTurn);
+    }
+
+
 }

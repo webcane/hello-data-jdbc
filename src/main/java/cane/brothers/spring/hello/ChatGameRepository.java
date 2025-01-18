@@ -5,7 +5,9 @@ package cane.brothers.spring.hello;
  *
  * @author cane
  */
-public interface ChatGameRepository {
+interface ChatGameRepository {
 
-    void newGame(Chat chat, Game game);
+    void saveNewGame(Chat chat);
+
+    void saveTurn(Chat chat);
 }

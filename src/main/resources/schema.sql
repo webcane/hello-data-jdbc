@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS guess_game (
     game_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     complexity INTEGER CHECK (complexity > 0 AND complexity < 10),
     secret INTEGER[],
-    chat_game_key INTEGER NOT NULL,
-    chat_game UUID NOT NULL REFERENCES chat_game(id)
+    ordinal INTEGER NOT NULL CHECK (ordinal >= 0),
+    chat_game UUID NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS guess_turn (
@@ -21,8 +21,6 @@ CREATE TABLE IF NOT EXISTS guess_turn (
     bulls INTEGER CHECK (bulls >= 0),
     cows INTEGER CHECK (cows >= 0),
     move_time TIMESTAMPTZ DEFAULT now(),
-	chat_game_key INTEGER NOT NULL,
-	chat_game UUID NOT NULL REFERENCES chat_game(id),
-    guess_game_key INTEGER NOT NULL,
-    guess_game UUID NOT NULL REFERENCES guess_game(game_id)
+    ordinal INTEGER NOT NULL CHECK (ordinal >= 0),
+    guess_game UUID NOT NULL
 );
