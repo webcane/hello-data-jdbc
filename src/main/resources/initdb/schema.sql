@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS guess_game (
     complexity INTEGER CHECK (complexity > 0 AND complexity < 10),
     secret INTEGER[],
     ordinal INTEGER NOT NULL CHECK (ordinal >= 0),
-    chat_game UUID NOT NULL
+    chat_game UUID NOT NULL REFERENCES chat_game(id)
 );
 
 CREATE TABLE IF NOT EXISTS guess_turn (
@@ -22,5 +22,5 @@ CREATE TABLE IF NOT EXISTS guess_turn (
     cows INTEGER CHECK (cows >= 0),
     move_time TIMESTAMPTZ DEFAULT now(),
     ordinal INTEGER NOT NULL CHECK (ordinal >= 0),
-    guess_game UUID NOT NULL
+    guess_game UUID NOT NULL REFERENCES guess_game(game_id)
 );
